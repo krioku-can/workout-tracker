@@ -54,7 +54,13 @@ async function loadData() {
     const res = await githubRequest('GET', '/contents/' + FILE_PATH + '?ref=' + BRANCH);
     if (res.status === 200) {
       const content = Buffer.from(res.data.content, 'base64').toString('utf8');
-      return JSON.parse(content);
+      const parsed = JSON.parse(content);
+      // Merge with defaults to handle empty or partial data
+      const defaults = JSON.parse(JSON.stringify(DEFAULT_DATA));
+      if (parsed.names) defaults.names = parsed.names;
+      if (parsed.workouts) defaults.workouts = parsed.workouts;
+      if (parsed.streaks) defaults.streaks = parsed.streaks;
+      return defaults;
     }
   } catch (e) {
     console.error('Error loading data:', e.message);

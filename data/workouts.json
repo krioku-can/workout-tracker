@@ -1,1 +1,8 @@
-{}
+{
+  "names": { "chris": "Chris", "chey": "Chey" },
+  "workouts": {},
+  "streaks": {
+    "chris": { "streak": 0, "total": 0, "today": false },
+    "chey": { "streak": 0, "total": 0, "today": false }
+  }
+}

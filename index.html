@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Chey & Chris — Nightly Workout</title>
+<style>
+  :root {
+    --bg: #0f0f13;
+    --card: #1a1a24;
+    --card-hover: #222233;
+    --accent: #7c5cfc;
+    --accent-dim: #5a3fc9;
+    --green: #34d399;
+    --green-dim: #1a8a5e;
+    --red: #f87171;
+    --orange: #fbbf24;
+    --text: #e8e8f0;
+    --text-dim: #8888a0;
+    --text-muted: #555570;
+    --border: #2a2a3a;
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0 0 100px 0;
+  }
+  .header {
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dim) 100%);
+    padding: 32px 20px 24px;
+    text-align: center;
+  }
+  .header h1 { font-size: 24px; font-weight: 700; letter-spacing: -0.5px; }
+  .header p { font-size: 14px; opacity: 0.8; margin-top: 4px; }
+  .container { max-width: 500px; margin: 0 auto; padding: 16px; }
+
+  .tab-bar { display: flex; gap: 8px; margin-bottom: 16px; }
+  .tab-btn {
+    flex: 1; padding: 10px; border: 2px solid var(--border);
+    border-radius: var(--radius-sm); background: var(--card);
+    color: var(--text-dim); font-size: 14px; font-weight: 600;
+    cursor: pointer; transition: all 0.2s; text-align: center;
+  }
+  .tab-btn.active { border-color: var(--accent); background: var(--card-hover); color: var(--text); }
+  .tab-btn:active { transform: scale(0.97); }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  .user-picker { display: flex; gap: 8px; margin-bottom: 16px; }
+  .user-btn {
+    flex: 1; padding: 12px; border: 2px solid var(--border);
+    border-radius: var(--radius-sm); background: var(--card);
+    color: var(--text); font-size: 16px; font-weight: 600;
+    cursor: pointer; transition: all 0.2s; text-align: center;
+  }
+  .user-btn.active { border-color: var(--accent); background: var(--card-hover); }
+  .user-btn:active { transform: scale(0.97); }
+
+  .streak-row { display: flex; gap: 10px; margin-bottom: 16px; }
+  .streak-card {
+    flex: 1; background: var(--card); border-radius: var(--radius);
+    padding: 16px; text-align: center; border: 1px solid var(--border);
+  }
+  .streak-card .name { font-size: 13px; color: var(--text-dim); margin-bottom: 4px; }
+  .streak-card .num { font-size: 32px; font-weight: 800; color: var(--accent); line-height: 1.2; }
+  .streak-card .label { font-size: 11px; color: var(--text-muted); }
+  .streak-card .total { font-size: 12px; color: var(--text-dim); margin-top: 4px; }
+  .streak-card .today-badge {
+    display: inline-block; margin-top: 6px; padding: 2px 10px;
+    border-radius: 20px; font-size: 11px; font-weight: 600;
+  }
+  .streak-card .today-badge.done { background: var(--green-dim); color: var(--green); }
+  .streak-card .today-badge.not-done { background: var(--border); color: var(--text-muted); }
+
+  .today-card {
+    background: var(--card); border-radius: var(--radius);
+    padding: 20px; margin-bottom: 16px; border: 1px solid var(--border);
+  }
+  .today-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+  .today-label { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); }
+  .today-day { font-size: 20px; font-weight: 700; }
+  .today-focus {
+    color: var(--accent); font-weight: 600; font-size: 16px;
+    background: rgba(124,92,252,0.1); padding: 4px 12px; border-radius: 20px; display: inline-block;
+  }
+  .today-icon { font-size: 40px; }
+
+  .exercise-list { display: flex; flex-direction: column; gap: 8px; margin: 12px 0; }
+  .exercise-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px; background: var(--bg);
+    border-radius: var(--radius-sm); border-left: 3px solid var(--accent);
+  }
+  .exercise-item .emoji { font-size: 24px; width: 36px; text-align: center; }
+  .exercise-item .info { flex: 1; }
+  .exercise-item .name { font-weight: 600; font-size: 15px; }
+  .exercise-item .detail { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
+  .exercise-item .reps { font-size: 14px; font-weight: 700; color: var(--accent); }
+
+  .round-info { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+  .round-badge {
+    padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;
+    background: var(--card); border: 1px solid var(--border);
+  }
+  .round-badge.work { border-color: var(--orange); color: var(--orange); }
+  .round-badge.rest { border-color: var(--green); color: var(--green); }
+
+  .btn-complete {
+    width: 100%; padding: 16px; border: none; border-radius: var(--radius-sm);
+    font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.2s;
+    margin-top: 16px;
+  }
+  .btn-complete.ready { background: var(--accent); color: white; }
+  .btn-complete.ready:active { transform: scale(0.97); }
+  .btn-complete.done { background: var(--green-dim); color: var(--green); }
+  .btn-complete:disabled { opacity: 0.5; cursor: default; }
+
+  .timer-bar {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px; background: var(--bg); border-radius: var(--radius-sm); margin-top: 12px;
+  }
+  .timer-display {
+    font-size: 28px; font-weight: 800; font-variant-numeric: tabular-nums;
+    min-width: 80px; text-align: center; color: var(--accent);
+  }
+  .timer-display.running { color: var(--green); }
+  .timer-controls { display: flex; gap: 6px; flex: 1; }
+  .timer-btn {
+    padding: 8px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+    background: var(--card); color: var(--text); font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: all 0.15s;
+  }
+  .timer-btn:active { transform: scale(0.95); }
+  .timer-btn.start { border-color: var(--green); color: var(--green); }
+  .timer-btn.stop { border-color: var(--red); color: var(--red); }
+  .timer-btn.reset { border-color: var(--text-muted); color: var(--text-muted); }
+
+  .week-section { margin-bottom: 16px; }
+  .week-title { font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 8px; }
+  .day-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px; background: var(--card); border-radius: var(--radius-sm);
+    margin-bottom: 6px; cursor: pointer; transition: all 0.15s;
+    border: 1px solid var(--border);
+  }
+  .day-row:active { transform: scale(0.98); }
+  .day-row.today { border-color: var(--accent); }
+  .day-check {
+    width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 700; flex-shrink: 0;
+  }
+  .day-check.done { background: var(--green-dim); border-color: var(--green); color: var(--green); }
+  .day-info { flex: 1; }
+  .day-name { font-size: 14px; font-weight: 600; }
+  .day-focus { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
+  .day-rest { color: var(--text-muted); }
+
+  .history-section { margin-bottom: 16px; }
+  .history-title { font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 8px; }
+  .history-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 12px; background: var(--card); border-radius: var(--radius-sm);
+    margin-bottom: 4px; font-size: 13px; border: 1px solid var(--border);
+  }
+  .history-date { color: var(--text-dim); min-width: 60px; }
+  .history-check { color: var(--green); font-weight: 700; }
+  .history-empty { color: var(--text-muted); font-size: 13px; padding: 20px; text-align: center; }
+
+  .run-card {
+    background: var(--card); border-radius: var(--radius);
+    padding: 20px; margin-bottom: 16px; border: 1px solid var(--border);
+  }
+  .run-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+  .run-week { font-size: 20px; font-weight: 700; }
+  .run-progress { font-size: 14px; color: var(--accent); font-weight: 600; }
+  .run-day {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px; background: var(--bg); border-radius: var(--radius-sm);
+    margin-bottom: 6px; border-left: 3px solid var(--accent);
+  }
+  .run-day .day { font-weight: 600; font-size: 14px; min-width: 50px; }
+  .run-day .desc { flex: 1; font-size: 13px; color: var(--text-dim); line-height: 1.4; }
+  .run-day .check {
+    width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 700; cursor: pointer; flex-shrink: 0;
+    transition: all 0.15s;
+  }
+  .run-day .check.done { background: var(--green-dim); border-color: var(--green); color: var(--green); }
+  .run-day .check:active { transform: scale(0.9); }
+
+  .modal-overlay {
+    display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.7); z-index: 100; align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--card); border-radius: var(--radius); padding: 24px;
+    max-width: 400px; width: 100%; max-height: 80vh; overflow-y: auto;
+    border: 1px solid var(--border);
+  }
+  .modal h2 { font-size: 20px; margin-bottom: 4px; }
+  .modal .sub { font-size: 14px; color: var(--text-dim); margin-bottom: 16px; }
+  .close-btn {
+    width: 100%; padding: 12px; border: 1px solid var(--border);
+    border-radius: var(--radius-sm); background: var(--bg);
+    color: var(--text); font-size: 14px; font-weight: 600; cursor: pointer;
+    margin-top: 16px;
+  }
+  .error-msg { color: var(--red); text-align: center; padding: 40px 20px; font-size: 16px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🏋️ Chey & Chris</h1>
+  <p>Nightly Bodyweight Workout + 5K Training</p>
+</div>
+
+<div class="container">
+  <div class="tab-bar">
+    <button class="tab-btn active" data-tab="bodyweight" onclick="switchTab('bodyweight')">💪 Bodyweight</button>
+    <button class="tab-btn" data-tab="5k" onclick="switchTab('5k')">🏃 5K Training</button>
+  </div>
+
+  <div class="user-picker" id="userPicker">
+    <button class="user-btn" data-user="chris" onclick="setUser('chris')">👤 Chris</button>
+    <button class="user-btn" data-user="chey" onclick="setUser('chey')">👤 Chey</button>
+  </div>
+
+  <div class="tab-content active" id="tabBodyweight">
+    <div class="streak-row" id="streakRow">
+      <div class="streak-card" id="streakChris">
+        <div class="name">Chris</div>
+        <div class="num">-</div>
+        <div class="label">day streak</div>
+        <div class="total"></div>
+        <div class="today-badge"></div>
+      </div>
+      <div class="streak-card" id="streakChey">
+        <div class="name">Chey</div>
+        <div class="num">-</div>
+        <div class="label">day streak</div>
+        <div class="total"></div>
+        <div class="today-badge"></div>
+      </div>
+    </div>
+
+    <div class="today-card" id="todayCard">
+      <div class="today-header">
+        <div>
+          <div class="today-label">Tonight's Workout</div>
+          <div class="today-day" id="todayDay"></div>
+          <div class="today-focus" id="todayFocus"></div>
+        </div>
+        <div class="today-icon" id="todayIcon">🏋️</div>
+      </div>
+      <div id="todayVisual"></div>
+      <div id="todayTimer"></div>
+      <button class="btn-complete ready" id="completeBtn" onclick="toggleToday()">✅ Mark Complete</button>
+    </div>
+
+    <div class="week-section">
+      <div class="week-title">This Week</div>
+      <div id="weekList"></div>
+    </div>
+
+    <div class="history-section">
+      <div class="history-title">Recent History</div>
+      <div id="historyList"></div>
+    </div>
+  </div>
+
+  <div class="tab-content" id="tab5k">
+    <div class="run-card">
+      <div class="run-header">
+        <div>
+          <div class="run-week" id="runWeek">Week 1</div>
+          <div style="font-size:12px;color:var(--text-dim);margin-top:2px">3 runs this week</div>
+        </div>
+        <div class="run-progress" id="runProgress">0/3 done</div>
+      </div>
+      <div id="runDays"></div>
+    </div>
+
+    <div class="run-card" style="background:var(--bg);border-color:var(--border)">
+      <div style="font-size:13px;color:var(--text-dim);line-height:1.6">
+        <strong style="color:var(--text)">How it works:</strong><br>
+        Run 3 days a week (Mon/Wed/Fri or whatever works). Rest days in between. Each week increases slightly. By week 9 you'll run a full 5K.
+      </div>
+    </div>
+
+    <div class="history-section">
+      <div class="history-title">Run History</div>
+      <div id="runHistoryList"></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal" id="modalContent">
+    <h2 id="modalTitle"></h2>
+    <div class="sub" id="modalSub"></div>
+    <div class="workout-detail" id="modalWorkout"></div>
+    <button class="close-btn" onclick="closeModal()">Close</button>
+  </div>
+</div>
+
+<script>
+// ─── 5K Training Plan (Couch to 5K) ────────────────────────
+const C25K = [
+  { week: 1, runs: ['Run 60s / Walk 90s x 8', 'Run 60s / Walk 90s x 8', 'Run 60s / Walk 90s x 8'] },
+  { week: 2, runs: ['Run 90s / Walk 2min x 6', 'Run 90s / Walk 2min x 6', 'Run 90s / Walk 2min x 6'] },
+  { week: 3, runs: ['Run 90s / Walk 90s x 4\nRun 3min / Walk 3min x 2', 'Run 90s / Walk 90s x 4\nRun 3min / Walk 3min x 2', 'Run 90s / Walk 90s x 4\nRun 3min / Walk 3min x 2'] },
+  { week: 4, runs: ['Run 3min / Walk 90s x 4', 'Run 3min / Walk 90s x 4', 'Run 3min / Walk 90s x 4'] },
+  { week: 5, runs: ['Run 5min / Walk 3min x 3', 'Run 8min / Walk 5min x 2', 'Run 20min straight'] },
+  { week: 6, runs: ['Run 8min / Walk 3min x 3', 'Run 10min / Walk 3min x 2', 'Run 22min straight'] },
+  { week: 7, runs: ['Run 25min straight', 'Run 25min straight', 'Run 25min straight'] },
+  { week: 8, runs: ['Run 28min straight', 'Run 28min straight', 'Run 28min straight'] },
+  { week: 9, runs: ['Run 30min straight', 'Run 30min straight', 'Run 5K!'] }
+];
+
+const EXERCISE_ICONS = {
+  'squat': '🦵', 'squats': '🦵', 'jump': '⬆️', 'push-up': '💪', 'push-ups': '💪',
+  'mountain climber': '⛰️', 'mountain climbers': '⛰️',
+  'plank': '📏', 'planks': '📏', 'shoulder tap': '👆', 'shoulder taps': '👆',
+  'hollow hold': '🌀', 'crunch': '💥', 'crunches': '💥',
+  'leg raise': '🦵', 'leg raises': '🦵',
+  'side plank': '📐',
+  'lunge': '🏃', 'lunges': '🏃', 'reverse lunge': '🏃', 'reverse lunges': '🏃',
+  'glute bridge': '🍑', 'glute bridges': '🍑',
+  'calf raise': '⬆️', 'calf raises': '⬆️',
+  'wall sit': '🧱',
+  'pike push-up': '🔻', 'pike push-ups': '🔻',
+  'tricep dip': '🪑', 'tricep dips': '🪑',
+  'superman': '🦸', 'supermans': '🦸',
+  'burpee': '💥', 'burpees': '💥',
+  'walking lunge': '🚶', 'walking lunges': '🚶',
+  'high knee': '🏃', 'high knees': '🏃',
+  'squat to stand': '🧘',
+  'cat-cow': '🐱', 'downward dog': '🐕', "runner's lunge": '🏃',
+  'pigeon pose': '🕊️', "child's pose": '🧒', 'spinal twist': '🌀',
+  'shavasana': '😴',
+  'stretch': '🤸', 'stretching': '🤸',
+  'jog': '🏃', 'arm circle': '🔄', 'leg swing': '🦵', 'torso twist': '🌀',
+  'walk': '🚶', 'run': '🏃'
+};
+
+const DAY_ICONS = {
+  'Monday': '🔥', 'Tuesday': '🌀', 'Wednesday': '🦵',
+  'Thursday': '💪', 'Friday': '💥', 'Saturday': '🧘', 'Sunday': '☀️'
+};
+
+const WORKOUTS = {
+  Monday: {
+    focus: 'Full Body HIIT', icon: '🔥', rounds: 3, work: 40, rest: 20,
+    exercises: [
+      { name: 'Squat jumps', detail: 'or regular squats', reps: '40s' },
+      { name: 'Push-ups', detail: 'any variation', reps: '40s' },
+      { name: 'Mountain climbers', detail: '', reps: '40s' },
+      { name: 'Plank shoulder taps', detail: '', reps: '40s' }
+    ]
+  },
+  Tuesday: {
+    focus: 'Core + Stretch', icon: '🌀', rounds: 3, work: null, rest: 60,
+    exercises: [
+      { name: 'Hollow hold', detail: '', reps: '30s' },
+      { name: 'Crunches', detail: '', reps: '12' },
+      { name: 'Leg raises', detail: '', reps: '10' },
+      { name: 'Side plank', detail: 'each side', reps: '30s' }
+    ],
+    note: 'Then 2 min deep stretching'
+  },
+  Wednesday: {
+    focus: 'Lower Body', icon: '🦵', rounds: 3, work: null, rest: 30,
+    exercises: [
+      { name: 'Squats', detail: '', reps: '15' },
+      { name: 'Reverse lunges', detail: 'each leg', reps: '10' },
+      { name: 'Glute bridges', detail: '', reps: '15' },
+      { name: 'Calf raises', detail: '', reps: '10' },
+      { name: 'Wall sit', detail: '', reps: '30s' }
+    ]
+  },
+  Thursday: {
+    focus: 'Upper Body + Core', icon: '💪', rounds: 3, work: null, rest: 30,
+    exercises: [
+      { name: 'Push-ups', detail: 'track your max!', reps: 'max' },
+      { name: 'Pike push-ups', detail: '', reps: '12' },
+      { name: 'Tricep dips', detail: 'use a chair', reps: '10' },
+      { name: 'Plank', detail: '', reps: '30s' },
+      { name: 'Supermans', detail: '', reps: '10' }
+    ]
+  },
+  Friday: {
+    focus: 'Full Body Flow', icon: '💥', rounds: 3, work: null, rest: 60,
+    exercises: [
+      { name: 'Burpees', detail: '', reps: '10' },
+      { name: 'Walking lunges', detail: '', reps: '15' },
+      { name: 'High knees', detail: '', reps: '20' },
+      { name: 'Squat to stand', detail: 'yoga flow', reps: '10' }
+    ]
+  },
+  Saturday: {
+    focus: 'Active Recovery', icon: '🧘', rounds: null, work: null, rest: null,
+    exercises: [
+      { name: 'Cat-cow', detail: '5 breaths', reps: '' },
+      { name: 'Downward dog', detail: '5 breaths', reps: '' },
+      { name: "Runner's lunge", detail: 'each side, 5 breaths', reps: '' },
+      { name: 'Pigeon pose', detail: 'each side, 5 breaths', reps: '' },
+      { name: "Child's pose", detail: '10 breaths', reps: '' },
+      { name: 'Spinal twist', detail: 'each side', reps: '' },
+      { name: 'Shavasana', detail: '2 min, eyes closed', reps: '' }
+    ]
+  },
+  Sunday: { focus: 'Rest', icon: '☀️', rounds: null, work: null, rest: null, exercises: [] }
+};
+
+const DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const API = '/api/workout';
+
+let currentUser = localStorage.getItem('wtUser') || null;
+let data = null;
+let timerInterval = null;
+let timerSeconds = 0;
+let timerRunning = false;
+let currentTab = 'bodyweight';
+
+async function fetchData() { const r = await fetch(API); data = await r.json(); return data; }
+async function markDone(user, date) {
+  const r = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user, date }) });
+  return r.json();
+}
+
+function setUser(user) {
+  currentUser = user; localStorage.setItem('wtUser', user);
+  document.querySelectorAll('.user-btn').forEach(b => b.classList.toggle('active', b.dataset.user === user));
+  render();
+}
+
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id === 'tab' + tab.charAt(0).toUpperCase() + tab.slice(1)));
+  render();
+}
+
+function todayStr() { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); }
+function dayName() { return DAYS[new Date().getDay()]; }
+
+async function toggleToday() {
+  if (!currentUser) { alert('Tap your name first!'); return; }
+  const ts = todayStr();
+  const btn = document.getElementById('completeBtn');
+  btn.textContent = 'Saving...'; btn.disabled = true;
+  await markDone(currentUser, ts);
+  await fetchData();
+  render();
+}
+
+function getWeekDates() {
+  const today = new Date(); const day = today.getDay();
+  const monday = new Date(today); monday.setDate(today.getDate() - ((day + 6) % 7));
+  const dates = [];
+  for (let i = 0; i < 7; i++) { const d = new Date(monday); d.setDate(monday.getDate() + i); dates.push(d); }
+  return dates;
+}
+
+function formatShort(d) { const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; return months[d.getMonth()] + ' ' + d.getDate(); }
+
+function startTimer(seconds) {
+  stopTimer(); timerSeconds = seconds || 0; timerRunning = true; updateTimerDisplay();
+  timerInterval = setInterval(() => { if (timerSeconds > 0) timerSeconds--; else { stopTimer(); beep(); } updateTimerDisplay(); }, 1000);
+}
+function stopTimer() { timerRunning = false; clearInterval(timerInterval); timerInterval = null; updateTimerDisplay(); }
+function resetTimer() { stopTimer(); timerSeconds = 0; updateTimerDisplay(); }
+function updateTimerDisplay() {
+  const el = document.getElementById('timerDisplay');
+  if (!el) return;
+  el.textContent = Math.floor(timerSeconds/60) + ':' + String(timerSeconds%60).padStart(2,'0');
+  el.className = 'timer-display' + (timerRunning ? ' running' : '');
+}
+function beep() { try { const ctx = new (window.AudioContext||window.webkitAudioContext)(); const o=ctx.createOscillator(); const g=ctx.createGain(); o.connect(g); g.connect(ctx.destination); o.frequency.value=800; g.gain.value=0.3; o.start(); setTimeout(()=>o.stop(),300); } catch(e){} }
+
+function getIcon(name) {
+  const lower = name.toLowerCase();
+  for (const [key, icon] of Object.entries(EXERCISE_ICONS)) { if (lower.includes(key)) return icon; }
+  return '🏋️';
+}
+
+function closeModal(e) { if (e && e.target !== e.currentTarget) return; document.getElementById('modalOverlay').classList.remove('open'); }
+
+function buildTodayVisual(day) {
+  const workout = WORKOUTS[day];
+  if (!workout) return '<div class="exercise-item"><span class="emoji">☀️</span><span>Rest day</span></div>';
+  let html = '';
+  if (workout.rounds) {
+    html += '<div class="round-info">';
+    html += '<span class="round-badge">' + workout.rounds + ' rounds</span>';
+    if (workout.work) html += '<span class="round-badge work">' + workout.work + 's work</span>';
+    if (workout.rest) html += '<span class="round-badge rest">' + workout.rest + 's rest</span>';
+    html += '</div>';
+  }
+  html += '<div class="exercise-list">';
+  workout.exercises.forEach(ex => {
+    const icon = getIcon(ex.name);
+    html += '<div class="exercise-item">';
+    html += '<span class="emoji">' + icon + '</span>';
+    html += '<div class="info"><div class="name">' + ex.name + '</div>';
+    if (ex.detail) html += '<div class="detail">' + ex.detail + '</div>';
+    html += '</div>';
+    if (ex.reps) html += '<span class="reps">' + ex.reps + '</span>';
+    html += '</div>';
+  });
+  html += '</div>';
+  if (workout.note) html += '<div style="font-size:13px;color:var(--text-dim);margin-top:8px;padding:8px 12px;background:var(--bg);border-radius:var(--radius-sm)">' + workout.note + '</div>';
+  return html;
+}
+
+function buildTimer(day) {
+  const workout = WORKOUTS[day];
+  if (!workout || !workout.work) return '';
+  return '<div class="timer-bar">' +
+    '<div class="timer-display" id="timerDisplay">0:00</div>' +
+    '<div class="timer-controls">' +
+    '<button class="timer-btn start" onclick="startTimer(' + workout.work + ')">> ' + workout.work + 's</button>' +
+    (workout.rest ? '<button class="timer-btn start" onclick="startTimer(' + workout.rest + ')">|> ' + workout.rest + 's</button>' : '') +
+    '<button class="timer-btn stop" onclick="stopTimer()">[]</button>' +
+    '<button class="timer-btn reset" onclick="resetTimer()">X</button>' +
+    '</div></div>';
+}
+
+// ─── 5K Functions ──────────────────────────────────────────
+function getRunWeek() {
+  const d = getData();
+  const runDates = d.runs || {};
+  const totalRuns = Object.keys(runDates).filter(k => runDates[k]).length;
+  const week = Math.min(Math.floor(totalRuns / 3), 8);
+  return week;
+}
+
+function getData() {
+  try { return JSON.parse(localStorage.getItem('workoutTracker5k')) || { runs: {}, startDate: null }; }
+  catch { return { runs: {}, startDate: null }; }
+}
+function setData(d) { localStorage.setItem('workoutTracker5k', JSON.stringify(d)); }
+
+function toggleRun(runIndex) {
+  if (!currentUser) { alert('Tap your name first!'); return; }
+  const d = getData();
+  if (!d.runs) d.runs = {};
+  const key = currentUser + '_week' + (getRunWeek() + 1) + '_run' + (runIndex + 1);
+  if (d.runs[key]) delete d.runs[key];
+  else d.runs[key] = true;
+  setData(d);
+  render5k();
+}
+
+function render5k() {
+  const weekIdx = getRunWeek();
+  const week = C25K[weekIdx];
+  const d = getData();
+
+  document.getElementById('runWeek').textContent = 'Week ' + (weekIdx + 1);
+
+  let doneThisWeek = 0;
+  let html = '';
+  week.runs.forEach((run, i) => {
+    const key = currentUser + '_week' + (weekIdx + 1) + '_run' + (i + 1);
+    const isDone = d.runs && d.runs[key] === true;
+    if (isDone) doneThisWeek++;
+
+    const lines = run.split('\n');
+    let descHtml = '';
+    lines.forEach((line, li) => {
+      if (li > 0) descHtml += '<br>';
+      descHtml += line;
+    });
+
+    html += '<div class="run-day">';
+    html += '<div class="day">Run ' + (i + 1) + '</div>';
+    html += '<div class="desc">' + descHtml + '</div>';
+    html += '<div class="check' + (isDone ? ' done' : '') + '" onclick="event.stopPropagation();toggleRun(' + i + ')">' + (isDone ? 'V' : '') + '</div>';
+    html += '</div>';
+  });
+  document.getElementById('runDays').innerHTML = html;
+  document.getElementById('runProgress').textContent = doneThisWeek + '/3 done';
+
+  const historyList = document.getElementById('runHistoryList');
+  historyList.innerHTML = '';
+  const allRuns = d.runs || {};
+  const keys = Object.keys(allRuns).filter(k => allRuns[k]).sort().reverse().slice(0, 14);
+  if (keys.length === 0) {
+    historyList.innerHTML = '<div class="history-empty">No runs logged yet. Start with Week 1!</div>';
+  } else {
+    keys.forEach(key => {
+      const parts = key.split('_');
+      const w = parts[1] || '';
+      const r = parts[2] || '';
+      const who = parts[0] === 'chris' ? 'Chris' : 'Chey';
+      const item = document.createElement('div');
+      item.className = 'history-item';
+      item.innerHTML = '<span class="history-check">V</span><span>' + who + ' - ' + w + ' ' + r + '</span>';
+      historyList.appendChild(item);
+    });
+  }
+}
+
+// ─── Render ─────────────────────────────────────────────────
+function render() {
+  if (!data) return;
+
+  if (currentTab === '5k') {
+    render5k();
+    return;
+  }
+
+  const ts = todayStr(); const day = dayName(); const workout = WORKOUTS[day];
+
+  for (const user of ['chris', 'chey']) {
+    const s = data.streaks[user];
+    const card = document.getElementById('streak' + (user === 'chris' ? 'Chris' : 'Chey'));
+    if (s) {
+      card.querySelector('.num').textContent = s.streak;
+      card.querySelector('.total').textContent = s.total + ' total';
+      const badge = card.querySelector('.today-badge');
+      badge.textContent = s.today ? 'Done today' : '- Not yet';
+      badge.className = 'today-badge ' + (s.today ? 'done' : 'not-done');
+    }
+  }
+
+  document.getElementById('todayDay').textContent = day;
+  if (workout) { document.getElementById('todayFocus').textContent = workout.focus; document.getElementById('todayIcon').textContent = DAY_ICONS[day] || '🏋️'; }
+  else { document.getElementById('todayFocus').textContent = 'Rest'; document.getElementById('todayIcon').textContent = '☀️'; }
+  document.getElementById('todayVisual').innerHTML = buildTodayVisual(day);
+  document.getElementById('todayTimer').innerHTML = buildTimer(day);
+
+  const btn = document.getElementById('completeBtn');
+  if (!currentUser) { btn.textContent = 'Tap your name first'; btn.className = 'btn-complete done'; btn.disabled = false; }
+  else if (data.streaks[currentUser]?.today) { btn.textContent = 'Done!'; btn.className = 'btn-complete done'; btn.disabled = false; }
+  else { btn.textContent = day === 'Sunday' ? 'Rest Day' : 'Mark Complete'; btn.className = 'btn-complete ready'; btn.disabled = false; }
+
+  const weekDates = getWeekDates();
+  const weekList = document.getElementById('weekList');
+  weekList.innerHTML = '';
+  weekDates.forEach(d => {
+    const s = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+    const dn = DAYS[d.getDay()]; const w = WORKOUTS[dn]; const isToday = s === ts;
+    const chrisDone = data.workouts?.chris?.[s] === true; const cheyDone = data.workouts?.chey?.[s] === true;
+    const row = document.createElement('div'); row.className = 'day-row' + (isToday ? ' today' : '');
+    row.onclick = () => openModal(dn, w);
+    const check = document.createElement('div'); check.className = 'day-check';
+    if (chrisDone && cheyDone) { check.classList.add('done'); check.textContent = 'V'; }
+    else if (chrisDone || cheyDone) { check.style.borderColor = 'var(--accent)'; check.textContent = chrisDone ? 'C' : 'Y'; check.style.fontSize = '10px'; check.style.fontWeight = '700'; check.style.color = 'var(--accent)'; }
+    row.appendChild(check);
+    const info = document.createElement('div'); info.className = 'day-info';
+    const name = document.createElement('div'); name.className = 'day-name';
+    name.textContent = (DAY_ICONS[dn] || '') + ' ' + dn + (isToday ? ' < today' : '');
+    info.appendChild(name);
+    const focus = document.createElement('div'); focus.className = 'day-focus';
+    if (w) focus.textContent = w.focus; else { focus.textContent = 'Rest'; focus.className = 'day-rest'; }
+    info.appendChild(focus); row.appendChild(info); weekList.appendChild(row);
+  });
+
+  const historyList = document.getElementById('historyList'); historyList.innerHTML = '';
+  const allDates = new Set();
+  if (data.workouts) { for (const user of ['chris', 'chey']) { if (data.workouts[user]) Object.keys(data.workouts[user]).forEach(k => allDates.add(k)); } }
+  const sorted = Array.from(allDates).sort().reverse().slice(0, 14);
+  if (sorted.length === 0) { historyList.innerHTML = '<div class="history-empty">No workouts logged yet. Start tonight!</div>'; }
+  else {
+    sorted.forEach(s => {
+      const d = new Date(s + 'T12:00:00'); const dn = DAYS[d.getDay()];
+      const chrisDone = data.workouts?.chris?.[s] === true; const cheyDone = data.workouts?.chey?.[s] === true;
+      const item = document.createElement('div'); item.className = 'history-item';
+      const who = chrisDone && cheyDone ? 'Both V' : chrisDone ? 'Chris V' : cheyDone ? 'Chey V' : '';
+      item.innerHTML = '<span class="history-date">' + formatShort(d) + '</span><span class="history-check">' + (chrisDone || cheyDone ? 'V' : '') + '</span><span>' + dn + '</span><span style="margin-left:auto;font-size:11px;color:var(--text-muted)">' + who + '</span>';
+      historyList.appendChild(item);
+    });
+  }
+}
+
+function openModal(dayName, workout) {
+  document.getElementById('modalTitle').textContent = dayName;
+  if (workout) {
+    document.getElementById('modalSub').textContent = workout.focus;
+    let html = '<div class="exercise-list">';
+    workout.exercises.forEach(ex => {
+      const icon = getIcon(ex.name);
+      html += '<div class="exercise-item">';
+      html += '<span class="emoji">' + icon + '</span>';
+      html += '<div class="info"><div class="name">' + ex.name + '</div>';
+      if (ex.detail) html += '<div class="detail">' + ex.detail + '</div>';
+      html += '</div>';
+      if (ex.reps) html += '<span class="reps">' + ex.reps + '</span>';
+      html += '</div>';
+    });
+    html += '</div>';
+    if (workout.note) html += '<div style="font-size:13px;color:var(--text-dim);margin-top:8px;padding:8px 12px;background:var(--bg);border-radius:var(--radius-sm)">' + workout.note + '</div>';
+    document.getElementById('modalWorkout').innerHTML = html;
+  } else {
+    document.getElementById('modalSub').textContent = 'Rest';
+    document.getElementById('modalWorkout').textContent = 'Rest day. Walk if you want.';
+  }
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+async function init() {
+  if (currentUser) document.querySelectorAll('.user-btn').forEach(b => b.classList.toggle('active', b.dataset.user === currentUser));
+  try { await fetchData(); render(); }
+  catch (e) { document.querySelector('.container').innerHTML = '<div class="error-msg">Could not load data. Check your connection.</div>'; }
+}
+init();
+</script>
+</body>
+</html>

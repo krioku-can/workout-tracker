@@ -1,8 +1,23 @@
 {
-  "names": { "chris": "Chris", "chey": "Chey" },
-  "workouts": {},
+  "names": {
+    "chris": "Chris",
+    "chey": "Chey"
+  },
+  "workouts": {
+    "chris": {
+      "2026-07-14": true
+    }
+  },
   "streaks": {
-    "chris": { "streak": 0, "total": 0, "today": false },
-    "chey": { "streak": 0, "total": 0, "today": false }
+    "chris": {
+      "streak": 1,
+      "total": 1,
+      "today": true
+    },
+    "chey": {
+      "streak": 0,
+      "total": 0,
+      "today": false
+    }
   }
 }

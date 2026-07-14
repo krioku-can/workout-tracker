@@ -4,7 +4,10 @@
     "chey": "Chey"
   },
   "workouts": {
-    "chris": {}
+    "chris": {},
+    "chey": {
+      "2026-07-14": true
+    }
   },
   "streaks": {
     "chris": {
@@ -13,9 +16,9 @@
       "today": false
     },
     "chey": {
-      "streak": 0,
-      "total": 0,
-      "today": false
+      "streak": 1,
+      "total": 1,
+      "today": true
     }
   }
 }

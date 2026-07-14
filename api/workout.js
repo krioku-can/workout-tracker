@@ -1,7 +1,12 @@
-const fs = require('fs');
-const path = require('path');
+const https = require('https');
 
-const DATA_FILE = path.join('/tmp', 'workout-data.json');
+const OWNER = 'krioku-can';
+const REPO = 'workout-tracker';
+const FILE_PATH = 'data/workouts.json';
+const BRANCH = 'main';
+
+// GitHub token from environment
+const TOKEN = process.env.GITHUB_TOKEN || '';
 
 const DEFAULT_DATA = {
   names: { chris: 'Chris', chey: 'Chey' },
@@ -12,10 +17,44 @@ const DEFAULT_DATA = {
   }
 };
 
-function loadData() {
+function githubRequest(method, path, body) {
+  return new Promise((resolve, reject) => {
+    const opts = {
+      hostname: 'api.github.com',
+      path: '/repos/' + OWNER + '/' + REPO + path,
+      method: method,
+      headers: {
+        'Authorization': 'Bearer ' + TOKEN,
+        'User-Agent': 'workout-tracker',
+        'Accept': 'application/vnd.github.v3+json',
+        'Content-Type': 'application/json',
+      }
+    };
+
+    const req = https.request(opts, (res) => {
+      let data = '';
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => {
+        try {
+          resolve({ status: res.statusCode, data: JSON.parse(data) });
+        } catch {
+          resolve({ status: res.statusCode, data: data });
+        }
+      });
+    });
+
+    req.on('error', reject);
+    if (body) req.write(JSON.stringify(body));
+    req.end();
+  });
+}
+
+async function loadData() {
   try {
-    if (fs.existsSync(DATA_FILE)) {
-      return JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
+    const res = await githubRequest('GET', '/contents/' + FILE_PATH + '?ref=' + BRANCH);
+    if (res.status === 200) {
+      const content = Buffer.from(res.data.content, 'base64').toString('utf8');
+      return JSON.parse(content);
     }
   } catch (e) {
     console.error('Error loading data:', e.message);
@@ -23,8 +62,31 @@ function loadData() {
   return JSON.parse(JSON.stringify(DEFAULT_DATA));
 }
 
-function saveData(data) {
-  fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
+async function saveData(data) {
+  try {
+    // Get current file info (for sha)
+    const current = await githubRequest('GET', '/contents/' + FILE_PATH + '?ref=' + BRANCH);
+    const sha = current.status === 200 ? current.data.sha : null;
+
+    const content = Buffer.from(JSON.stringify(data, null, 2)).toString('base64');
+
+    const body = {
+      message: 'Workout update: ' + new Date().toISOString().slice(0, 10),
+      content: content,
+      branch: BRANCH,
+    };
+    if (sha) body.sha = sha;
+
+    const res = await githubRequest('PUT', '/contents/' + FILE_PATH, body);
+    if (res.status === 200 || res.status === 201) {
+      return true;
+    }
+    console.error('GitHub save error:', res.status, JSON.stringify(res.data).slice(0, 200));
+    return false;
+  } catch (e) {
+    console.error('Error saving data:', e.message);
+    return false;
+  }
 }
 
 function recalcStreaks(data) {
@@ -45,7 +107,6 @@ function recalcStreaks(data) {
     if (dates.length > 0) {
       data.streaks[user].today = dates[0] === todayStr;
 
-      // Calculate current streak
       let streak = 0;
       const current = new Date();
       for (let i = 0; i < dates.length; i++) {
@@ -75,7 +136,7 @@ module.exports = async (req, res) => {
   }
 
   if (req.method === 'GET') {
-    const data = loadData();
+    const data = await loadData();
     res.setHeader('Content-Type', 'application/json');
     res.status(200).json(data);
     return;
@@ -92,10 +153,9 @@ module.exports = async (req, res) => {
       return;
     }
 
-    const data = loadData();
+    const data = await loadData();
     if (!data.workouts[user]) data.workouts[user] = {};
 
-    // Toggle: if already done, undo it
     if (data.workouts[user][date] === true) {
       delete data.workouts[user][date];
     } else {
@@ -103,7 +163,12 @@ module.exports = async (req, res) => {
     }
 
     recalcStreaks(data);
-    saveData(data);
+    const saved = await saveData(data);
+
+    if (!saved) {
+      res.status(500).json({ error: 'Failed to save data' });
+      return;
+    }
 
     res.setHeader('Content-Type', 'application/json');
     res.status(200).json(data);

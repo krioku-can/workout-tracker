@@ -104,7 +104,7 @@ function recalcStreaks(data) {
   for (const user of ['chris', 'chey']) {
     const userWorkouts = data.workouts[user] || {};
     const dates = Object.keys(userWorkouts)
-      .filter(d => userWorkouts[d] === true)
+      .filter(d => userWorkouts[d] === true || userWorkouts[d] > 0)
       .sort()
       .reverse();
 
@@ -149,7 +149,7 @@ module.exports = async (req, res) => {
   }
 
   if (req.method === 'POST') {
-    const { user, date } = req.body;
+    const { user, date, count } = req.body;
     if (!user || !date) {
       res.status(400).json({ error: 'Missing user or date' });
       return;
@@ -162,10 +162,11 @@ module.exports = async (req, res) => {
     const data = await loadData();
     if (!data.workouts[user]) data.workouts[user] = {};
 
-    if (data.workouts[user][date] === true) {
+    if (data.workouts[user][date] === true || data.workouts[user][date] != null) {
       delete data.workouts[user][date];
     } else {
-      data.workouts[user][date] = true;
+      // Store the rep count if provided, else true (backward compat)
+      data.workouts[user][date] = (typeof count === 'number' && count > 0) ? count : true;
     }
 
     recalcStreaks(data);

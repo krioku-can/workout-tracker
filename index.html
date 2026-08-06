@@ -220,13 +220,13 @@
 <body>
 
 <div class="header">
-  <h1>🏋️ Chey & Chris</h1>
-  <p>Nightly Bodyweight Workout + 5K Training</p>
+  <h1>💪 Chey & Chris</h1>
+  <p>Pushups + 5K Training</p>
 </div>
 
 <div class="container">
   <div class="tab-bar">
-    <button class="tab-btn active" data-tab="bodyweight" onclick="switchTab('bodyweight')">💪 Bodyweight</button>
+    <button class="tab-btn active" data-tab="bodyweight" onclick="switchTab('bodyweight')">💪 Pushups</button>
     <button class="tab-btn" data-tab="5k" onclick="switchTab('5k')">🏃 5K Training</button>
   </div>
 
@@ -256,13 +256,20 @@
     <div class="today-card" id="todayCard">
       <div class="today-header">
         <div>
-          <div class="today-label">Tonight's Workout</div>
+          <div class="today-label">Today's Goal</div>
           <div class="today-day" id="todayDay"></div>
           <div class="today-focus" id="todayFocus"></div>
         </div>
-        <div class="today-icon" id="todayIcon">🏋️</div>
+        <div class="today-icon" id="todayIcon">💪</div>
       </div>
       <div id="todayVisual"></div>
+      <div id="pushupEntry" style="margin-top:12px;display:none">
+        <div style="display:flex;align-items:center;gap:8px">
+          <label style="font-size:13px;color:var(--text-dim);flex:0 0 auto">Pushups done:</label>
+          <input id="pushupCount" type="number" min="0" max="300" inputmode="numeric" style="flex:1;min-width:0;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);font-size:18px;font-weight:700;text-align:center">
+          <span style="font-size:13px;color:var(--text-dim);flex:0 0 auto">/ 100</span>
+        </div>
+      </div>
       <div id="todayTimer"></div>
       <button class="btn-complete ready" id="completeBtn" onclick="toggleToday()">✅ Mark Complete</button>
     </div>
@@ -358,68 +365,65 @@ const DAY_ICONS = {
   'Thursday': '💪', 'Friday': '💥', 'Saturday': '🧘', 'Sunday': '☀️'
 };
 
+// Rest-aware pushup plan. Chest/triceps/shoulders need ~48h to recover,
+// so hard days are spaced with light days + full rest days in between.
+// Hard = full 100 proper-form. Light = ~50-60% volume, easier variation.
 const WORKOUTS = {
   Monday: {
-    focus: 'Full Body HIIT', icon: '🔥', rounds: 3, work: 40, rest: 20,
+    focus: 'Pushups — Hard', icon: '🔥', rounds: 1, work: null, rest: 30,
+    goal: 100,
     exercises: [
-      { name: 'Squat jumps', detail: 'or regular squats', reps: '40s' },
-      { name: 'Push-ups', detail: 'any variation', reps: '40s' },
-      { name: 'Mountain climbers', detail: '', reps: '40s' },
-      { name: 'Plank shoulder taps', detail: '', reps: '40s' }
-    ]
+      { name: 'Push-ups', detail: 'full range, proper form', reps: '100 total' },
+      { name: 'Split into sets', detail: 'as many as you can per set, rest 30-60s between', reps: '10 x 10' }
+    ],
+    note: 'Hard day. Do the full 100 in as few sets as you can. Log your total.'
   },
   Tuesday: {
-    focus: 'Core + Stretch', icon: '🌀', rounds: 3, work: null, rest: 60,
+    focus: 'Pushups — Light', icon: '🌀', rounds: 1, work: null, rest: 30,
+    goal: 50,
     exercises: [
-      { name: 'Hollow hold', detail: '', reps: '30s' },
-      { name: 'Crunches', detail: '', reps: '12' },
-      { name: 'Leg raises', detail: '', reps: '10' },
-      { name: 'Side plank', detail: 'each side', reps: '30s' }
+      { name: 'Push-ups', detail: 'easy volume, incline or knee OK', reps: '~50' },
+      { name: 'Tricep dips', detail: 'use a chair', reps: '10' },
+      { name: 'Stretching', detail: 'chest + shoulders', reps: '2 min' }
     ],
-    note: 'Then 2 min deep stretching'
+    note: 'Light day. Keep the habit, keep blood flow — don’t max out.'
   },
   Wednesday: {
-    focus: 'Lower Body', icon: '🦵', rounds: 3, work: null, rest: 30,
+    focus: 'Pushups — Hard', icon: '💪', rounds: 1, work: null, rest: 30,
+    goal: 100,
     exercises: [
-      { name: 'Squats', detail: '', reps: '15' },
-      { name: 'Reverse lunges', detail: 'each leg', reps: '10' },
-      { name: 'Glute bridges', detail: '', reps: '15' },
-      { name: 'Calf raises', detail: '', reps: '10' },
-      { name: 'Wall sit', detail: '', reps: '30s' }
-    ]
+      { name: 'Push-ups', detail: 'full range, proper form', reps: '100 total' },
+      { name: 'Split into sets', detail: 'as many as you can per set, rest 30-60s between', reps: '10 x 10' }
+    ],
+    note: 'Hard day. Full 100. Log your total.'
   },
   Thursday: {
-    focus: 'Upper Body + Core', icon: '💪', rounds: 3, work: null, rest: 30,
+    focus: 'Rest', icon: '☀️', rounds: null, work: null, rest: null,
+    goal: 0,
     exercises: [
-      { name: 'Push-ups', detail: 'track your max!', reps: 'max' },
-      { name: 'Pike push-ups', detail: '', reps: '12' },
-      { name: 'Tricep dips', detail: 'use a chair', reps: '10' },
-      { name: 'Plank', detail: '', reps: '30s' },
-      { name: 'Supermans', detail: '', reps: '10' }
-    ]
+      { name: 'Full rest', detail: 'let chest, triceps, shoulders recover', reps: '' }
+    ],
+    note: 'Rest day. Muscles grow during recovery. Do nothing pushup-related.'
   },
   Friday: {
-    focus: 'Full Body Flow', icon: '💥', rounds: 3, work: null, rest: 60,
+    focus: 'Pushups — Hard', icon: '💥', rounds: 1, work: null, rest: 30,
+    goal: 100,
     exercises: [
-      { name: 'Burpees', detail: '', reps: '10' },
-      { name: 'Walking lunges', detail: '', reps: '15' },
-      { name: 'High knees', detail: '', reps: '20' },
-      { name: 'Squat to stand', detail: 'yoga flow', reps: '10' }
-    ]
+      { name: 'Push-ups', detail: 'full range, proper form', reps: '100 total' },
+      { name: 'Split into sets', detail: 'as many as you can per set, rest 30-60s between', reps: '10 x 10' }
+    ],
+    note: 'Hard day. Full 100. Log your total.'
   },
   Saturday: {
-    focus: 'Active Recovery', icon: '🧘', rounds: null, work: null, rest: null,
+    focus: 'Pushups — Light', icon: '🧘', rounds: 1, work: null, rest: 30,
+    goal: 50,
     exercises: [
-      { name: 'Cat-cow', detail: '5 breaths', reps: '' },
-      { name: 'Downward dog', detail: '5 breaths', reps: '' },
-      { name: "Runner's lunge", detail: 'each side, 5 breaths', reps: '' },
-      { name: 'Pigeon pose', detail: 'each side, 5 breaths', reps: '' },
-      { name: "Child's pose", detail: '10 breaths', reps: '' },
-      { name: 'Spinal twist', detail: 'each side', reps: '' },
-      { name: 'Shavasana', detail: '2 min, eyes closed', reps: '' }
-    ]
+      { name: 'Push-ups', detail: 'easy volume', reps: '~50' },
+      { name: 'Stretching', detail: 'chest + shoulders', reps: '3 min' }
+    ],
+    note: 'Light day. Optional — easy sets only.'
   },
-  Sunday: { focus: 'Rest', icon: '☀️', rounds: null, work: null, rest: null, exercises: [] }
+  Sunday: { focus: 'Rest', icon: '☀️', rounds: null, work: null, rest: null, goal: 0, exercises: [], note: 'Rest day. Full recovery before the next hard block.' }
 };
 
 const DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
@@ -433,8 +437,8 @@ let timerRunning = false;
 let currentTab = 'bodyweight';
 
 async function fetchData() { const r = await fetch(API); data = await r.json(); return data; }
-async function markDone(user, date) {
-  const r = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user, date }) });
+async function markDone(user, date, count) {
+  const r = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user, date, count }) });
   return r.json();
 }
 
@@ -459,7 +463,9 @@ async function toggleToday() {
   const ts = todayStr();
   const btn = document.getElementById('completeBtn');
   btn.textContent = 'Saving...'; btn.disabled = true;
-  await markDone(currentUser, ts);
+  const countInput = document.getElementById('pushupCount');
+  const count = countInput ? parseInt(countInput.value, 10) : null;
+  await markDone(currentUser, ts, isNaN(count) ? null : count);
   await fetchData();
   render();
 }
@@ -500,11 +506,9 @@ function buildTodayVisual(day) {
   const workout = WORKOUTS[day];
   if (!workout) return '<div class="exercise-item"><span class="emoji">☀️</span><span>Rest day</span></div>';
   let html = '';
-  if (workout.rounds) {
+  if (workout.goal && workout.goal > 0) {
     html += '<div class="round-info">';
-    html += '<span class="round-badge">' + workout.rounds + ' rounds</span>';
-    if (workout.work) html += '<span class="round-badge work">' + workout.work + 's work</span>';
-    if (workout.rest) html += '<span class="round-badge rest">' + workout.rest + 's rest</span>';
+    html += '<span class="round-badge">🎯 Goal: ' + workout.goal + ' pushups</span>';
     html += '</div>';
   }
   html += '<div class="exercise-list">';
@@ -636,15 +640,28 @@ function render() {
   }
 
   document.getElementById('todayDay').textContent = day;
-  if (workout) { document.getElementById('todayFocus').textContent = workout.focus; document.getElementById('todayIcon').textContent = DAY_ICONS[day] || '🏋️'; }
+  const isRestDay = !workout || (workout.goal === 0);
+  if (workout) { document.getElementById('todayFocus').textContent = workout.focus; document.getElementById('todayIcon').textContent = DAY_ICONS[day] || '💪'; }
   else { document.getElementById('todayFocus').textContent = 'Rest'; document.getElementById('todayIcon').textContent = '☀️'; }
   document.getElementById('todayVisual').innerHTML = buildTodayVisual(day);
   document.getElementById('todayTimer').innerHTML = buildTimer(day);
 
+  // Show pushup entry on non-rest days
+  const entry = document.getElementById('pushupEntry');
+  if (entry) entry.style.display = isRestDay ? 'none' : 'flex';
+
+  // Pre-fill today's stored count if already logged
+  const countInput = document.getElementById('pushupCount');
+  const storedCount = currentUser && data.workouts?.[currentUser]?.[todayStr()];
+  if (countInput && typeof storedCount === 'number') {
+    countInput.value = storedCount;
+  }
+
   const btn = document.getElementById('completeBtn');
   if (!currentUser) { btn.textContent = 'Tap your name first'; btn.className = 'btn-complete done'; btn.disabled = false; }
+  else if (isRestDay) { btn.textContent = 'Rest Day'; btn.className = 'btn-complete done'; btn.disabled = true; }
   else if (data.streaks[currentUser]?.today) { btn.textContent = 'Done!'; btn.className = 'btn-complete done'; btn.disabled = false; }
-  else { btn.textContent = day === 'Sunday' ? 'Rest Day' : 'Mark Complete'; btn.className = 'btn-complete ready'; btn.disabled = false; }
+  else { btn.textContent = 'Mark Complete'; btn.className = 'btn-complete ready'; btn.disabled = false; }
 
   const weekDates = getWeekDates();
   const weekList = document.getElementById('weekList');
@@ -676,10 +693,20 @@ function render() {
   else {
     sorted.forEach(s => {
       const d = new Date(s + 'T12:00:00'); const dn = DAYS[d.getDay()];
-      const chrisDone = data.workouts?.chris?.[s] === true; const cheyDone = data.workouts?.chey?.[s] === true;
+      const chrisVal = data.workouts?.chris?.[s]; const cheyVal = data.workouts?.chey?.[s];
+      const chrisDone = chrisVal === true || (typeof chrisVal === 'number' && chrisVal > 0);
+      const cheyDone = cheyVal === true || (typeof cheyVal === 'number' && cheyVal > 0);
+      let who = '';
+      if (chrisDone && cheyDone) who = 'Both V';
+      else if (chrisDone) who = 'Chris V';
+      else if (cheyDone) who = 'Chey V';
+      // Append rep counts when logged as numbers
+      const repText = [];
+      if (typeof chrisVal === 'number') repText.push('C:' + chrisVal);
+      if (typeof cheyVal === 'number') repText.push('Y:' + cheyVal);
+      const repSuffix = repText.length ? ' (' + repText.join(' ') + ')' : '';
       const item = document.createElement('div'); item.className = 'history-item';
-      const who = chrisDone && cheyDone ? 'Both V' : chrisDone ? 'Chris V' : cheyDone ? 'Chey V' : '';
-      item.innerHTML = '<span class="history-date">' + formatShort(d) + '</span><span class="history-check">' + (chrisDone || cheyDone ? 'V' : '') + '</span><span>' + dn + '</span><span style="margin-left:auto;font-size:11px;color:var(--text-muted)">' + who + '</span>';
+      item.innerHTML = '<span class="history-date">' + formatShort(d) + '</span><span class="history-check">' + (chrisDone || cheyDone ? 'V' : '') + '</span><span>' + dn + '</span><span style="margin-left:auto;font-size:11px;color:var(--text-muted)">' + who + repSuffix + '</span>';
       historyList.appendChild(item);
     });
   }

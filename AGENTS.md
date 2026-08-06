@@ -1,8 +1,8 @@
 # AGENTS.md — Workout Tracker (Chris & Chey)
 
 ## What this is
-Shared nightly workout web app for **Chris + Chey**:
-- Bodyweight weekly plan + timer + streaks
+Shared pushup + running tracker for **Chris + Chey**:
+- Rest-aware pushup plan (hard/light/rest days) + rep logging + streaks
 - Couch to 5K tab (localStorage for run checkoffs)
 - Mark Complete persists to shared backend
 

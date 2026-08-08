@@ -470,6 +470,18 @@ async function toggleToday() {
   render();
 }
 
+// Toggle completion for any specific date (today or a past day) for the current user.
+async function toggleDate(dateStr) {
+  if (!currentUser) { alert('Tap your name first!'); return; }
+  const btn = document.getElementById('completeBtn');
+  const wasBusy = btn && btn.disabled;
+  if (btn) { btn.textContent = 'Saving...'; btn.disabled = true; }
+  await markDone(currentUser, dateStr, null);
+  await fetchData();
+  render();
+  if (btn && !wasBusy) { btn.disabled = false; }
+}
+
 function getWeekDates() {
   const today = new Date(); const day = today.getDay();
   const monday = new Date(today); monday.setDate(today.getDate() - ((day + 6) % 7));
@@ -673,6 +685,8 @@ function render() {
     const row = document.createElement('div'); row.className = 'day-row' + (isToday ? ' today' : '');
     row.onclick = () => openModal(dn, w);
     const check = document.createElement('div'); check.className = 'day-check';
+    // Tapping the check circle toggles completion for that day (today or past).
+    check.onclick = (e) => { e.stopPropagation(); toggleDate(s); };
     if (chrisDone && cheyDone) { check.classList.add('done'); check.textContent = 'V'; }
     else if (chrisDone || cheyDone) { check.style.borderColor = 'var(--accent)'; check.textContent = chrisDone ? 'C' : 'Y'; check.style.fontSize = '10px'; check.style.fontWeight = '700'; check.style.color = 'var(--accent)'; }
     row.appendChild(check);

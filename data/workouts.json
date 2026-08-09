@@ -8,7 +8,8 @@
       "2026-07-14": true,
       "2026-07-15": true,
       "2026-08-07": true,
-      "2026-08-08": true
+      "2026-08-08": true,
+      "2026-08-09": true
     },
     "chey": {
       "2026-07-14": true,
@@ -17,9 +18,9 @@
   },
   "streaks": {
     "chris": {
-      "streak": 0,
-      "total": 4,
-      "today": false
+      "streak": 3,
+      "total": 5,
+      "today": true
     },
     "chey": {
       "streak": 0,

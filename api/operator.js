@@ -44,6 +44,7 @@ async function loadData() {
       const content = Buffer.from(res.data.content, "base64").toString("utf8");
       const parsed = JSON.parse(content);
       if (!Array.isArray(parsed.changes)) parsed.changes = [];
+      if (!parsed.records || typeof parsed.records !== "object") parsed.records = {};
       return { data: parsed, sha: res.data.sha };
     }
   } catch (e) {
@@ -95,6 +96,23 @@ module.exports = async (req, res) => {
     }
     const loaded = await loadData();
     const data = loaded.data;
+    if (!data.records) data.records = {};
+    const raw = req.body && req.body.patch;
+    if (raw && typeof raw === "object") {
+      const allowed = ["name", "role", "blurb", "biz", "where", "note", "nextWhat", "nextWhen", "at"];
+      const rec = Object.assign({}, data.records[id] || {});
+      allowed.forEach((k) => {
+        if (raw[k] != null && String(raw[k]).trim()) rec[k] = clean(raw[k], k === "nextWhat" || k === "note" || k === "blurb" ? 240 : 80);
+      });
+      if (Array.isArray(raw.facts)) {
+        rec.facts = raw.facts
+          .filter((f) => Array.isArray(f) && f[0] && f[1])
+          .slice(-20)
+          .map((f) => [clean(f[0], 40), clean(f[1], 160)]);
+      }
+      rec.at = new Date().toISOString();
+      data.records[id] = rec;
+    }
     data.changes.push({
       at: new Date().toISOString(),
       kind: kind,

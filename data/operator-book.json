@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-23T21:48:33.307Z",
+  "updated": "2026-08-23T22:27:08.035Z",
   "changes": [
     {
       "at": "2026-08-23T21:48:33.307Z",
@@ -7,6 +7,23 @@
       "id": "mom-dinner-2026-08-23",
       "name": "mom-dinner-2026-08-23",
       "text": "We are having Pork Steak. Mashed Potatoes. Corn Bread. Corn on the Cob."
+    },
+    {
+      "at": "2026-08-23T22:27:08.035Z",
+      "kind": "edit",
+      "id": "leora",
+      "name": "Leora",
+      "text": "name Leora · role Stepdaughter · next Wed pickup from school. Home Thu–Fri. Not Tuesdays. Birthday still missing."
     }
-  ]
+  ],
+  "records": {
+    "leora": {
+      "name": "Leora",
+      "role": "Stepdaughter",
+      "blurb": "Quests and being the hero. Kindergarten 25–26.",
+      "nextWhat": "Wed pickup from school. Home Thu–Fri. Not Tuesdays. Birthday still missing.",
+      "at": "2026-08-23T22:27:08.035Z"
+    }
+  },
+  "rels": []
 }

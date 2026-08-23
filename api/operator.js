@@ -115,6 +115,7 @@ module.exports = async (req, res) => {
           .filter((f) => Array.isArray(f) && f[0] && f[1])
           .slice(-20)
           .map((f) => [clean(f[0], 40), clean(f[1], 160)]);
+        rec.factsReplace = true;
       }
       rec.at = new Date().toISOString();
       data.records[id] = rec;

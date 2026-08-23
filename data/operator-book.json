@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-23T22:32:23.377Z",
+  "updated": "2026-08-23T23:04:23.968Z",
   "changes": [
     {
       "at": "2026-08-23T21:48:33.307Z",
@@ -21,6 +21,13 @@
       "id": "chris",
       "name": "Chris Nelloms",
       "text": "name Chris Nelloms · role Me · next Nightly workout 9pm. · +3 fact"
+    },
+    {
+      "at": "2026-08-23T23:04:23.968Z",
+      "kind": "journal",
+      "id": "couples-hang",
+      "name": "couples-hang",
+      "text": "Logged hang / check-in."
     }
   ],
   "records": {

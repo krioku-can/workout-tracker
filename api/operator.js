@@ -45,6 +45,7 @@ async function loadData() {
       const parsed = JSON.parse(content);
       if (!Array.isArray(parsed.changes)) parsed.changes = [];
       if (!parsed.records || typeof parsed.records !== "object") parsed.records = {};
+      if (!Array.isArray(parsed.rels)) parsed.rels = [];
       return { data: parsed, sha: res.data.sha };
     }
   } catch (e) {
@@ -97,6 +98,11 @@ module.exports = async (req, res) => {
     const loaded = await loadData();
     const data = loaded.data;
     if (!data.records) data.records = {};
+    if (!Array.isArray(data.rels)) data.rels = [];
+    if (kind === "rel-option" && text && data.rels.indexOf(text) === -1) {
+      data.rels.push(text);
+      if (data.rels.length > 80) data.rels = data.rels.slice(-80);
+    }
     const raw = req.body && req.body.patch;
     if (raw && typeof raw === "object") {
       const allowed = ["name", "role", "blurb", "biz", "where", "note", "nextWhat", "nextWhen", "at"];

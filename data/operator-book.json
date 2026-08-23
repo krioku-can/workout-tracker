@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-23T22:27:08.035Z",
+  "updated": "2026-08-23T22:32:23.377Z",
   "changes": [
     {
       "at": "2026-08-23T21:48:33.307Z",
@@ -14,6 +14,13 @@
       "id": "leora",
       "name": "Leora",
       "text": "name Leora · role Stepdaughter · next Wed pickup from school. Home Thu–Fri. Not Tuesdays. Birthday still missing."
+    },
+    {
+      "at": "2026-08-23T22:32:23.377Z",
+      "kind": "edit",
+      "id": "chris",
+      "name": "Chris Nelloms",
+      "text": "name Chris Nelloms · role Me · next Nightly workout 9pm. · +3 fact"
     }
   ],
   "records": {
@@ -23,6 +30,28 @@
       "blurb": "Quests and being the hero. Kindergarten 25–26.",
       "nextWhat": "Wed pickup from school. Home Thu–Fri. Not Tuesdays. Birthday still missing.",
       "at": "2026-08-23T22:27:08.035Z"
+    },
+    "chris": {
+      "name": "Chris Nelloms",
+      "role": "Me",
+      "blurb": "Birthday April 6.",
+      "nextWhat": "Nightly workout 9pm.",
+      "at": "2026-08-23T22:32:23.377Z",
+      "facts": [
+        [
+          "Birthday",
+          "April 6, 1993"
+        ],
+        [
+          "Home city",
+          "Richmond, Indiana"
+        ],
+        [
+          "Nightly",
+          "Bodyweight workout 9pm — tracker linked below"
+        ]
+      ],
+      "factsReplace": true
     }
   },
   "rels": []

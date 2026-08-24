@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-23T23:04:23.968Z",
+  "updated": "2026-08-24T00:55:56.413Z",
   "changes": [
     {
       "at": "2026-08-23T21:48:33.307Z",
@@ -28,6 +28,13 @@
       "id": "couples-hang",
       "name": "couples-hang",
       "text": "Logged hang / check-in."
+    },
+    {
+      "at": "2026-08-24T00:55:56.413Z",
+      "kind": "edit",
+      "id": "chris",
+      "name": "Chris",
+      "text": "name Chris · nick Chris · role Me · next Nightly workout 9pm. · +3 fact"
     }
   ],
   "records": {
@@ -39,11 +46,11 @@
       "at": "2026-08-23T22:27:08.035Z"
     },
     "chris": {
-      "name": "Chris Nelloms",
+      "name": "Chris",
       "role": "Me",
       "blurb": "Birthday April 6.",
       "nextWhat": "Nightly workout 9pm.",
-      "at": "2026-08-23T22:32:23.377Z",
+      "at": "2026-08-24T00:55:56.413Z",
       "facts": [
         [
           "Birthday",

@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-24T00:55:56.413Z",
+  "updated": "2026-08-24T00:56:06.030Z",
   "changes": [
     {
       "at": "2026-08-23T21:48:33.307Z",
@@ -35,6 +35,13 @@
       "id": "chris",
       "name": "Chris",
       "text": "name Chris · nick Chris · role Me · next Nightly workout 9pm. · +3 fact"
+    },
+    {
+      "at": "2026-08-24T00:56:06.030Z",
+      "kind": "edit",
+      "id": "chris",
+      "name": "Chris",
+      "text": "name Chris · nick Chris · role Me · next Nightly workout 9pm. · +2 fact"
     }
   ],
   "records": {
@@ -50,7 +57,7 @@
       "role": "Me",
       "blurb": "Birthday April 6.",
       "nextWhat": "Nightly workout 9pm.",
-      "at": "2026-08-24T00:55:56.413Z",
+      "at": "2026-08-24T00:56:06.030Z",
       "facts": [
         [
           "Birthday",
@@ -59,10 +66,6 @@
         [
           "Home city",
           "Richmond, Indiana"
-        ],
-        [
-          "Nightly",
-          "Bodyweight workout 9pm — tracker linked below"
         ]
       ],
       "factsReplace": true

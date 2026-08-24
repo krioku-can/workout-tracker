@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-24T00:56:06.030Z",
+  "updated": "2026-08-24T02:03:26.213Z",
   "changes": [
     {
       "at": "2026-08-23T21:48:33.307Z",
@@ -42,6 +42,13 @@
       "id": "chris",
       "name": "Chris",
       "text": "name Chris · nick Chris · role Me · next Nightly workout 9pm. · +2 fact"
+    },
+    {
+      "at": "2026-08-24T02:03:26.213Z",
+      "kind": "edit",
+      "id": "anthony",
+      "name": "Anthony Chustz",
+      "text": "name Anthony Chustz · role Friend · next Monthly hang with Marlena, Chris, and Chey. · +4 fact"
     }
   ],
   "records": {
@@ -66,6 +73,32 @@
         [
           "Home city",
           "Richmond, Indiana"
+        ]
+      ],
+      "factsReplace": true
+    },
+    "anthony": {
+      "name": "Anthony Chustz",
+      "role": "Friend",
+      "blurb": "Chris's friend. Hangs with Chris and Chey.",
+      "nextWhat": "Monthly hang with Marlena, Chris, and Chey.",
+      "at": "2026-08-24T02:03:26.213Z",
+      "facts": [
+        [
+          "Friend of",
+          "Chris"
+        ],
+        [
+          "Where",
+          "Dayton, Ohio"
+        ],
+        [
+          "Do (file)",
+          "Walks, basketball, gaming (PS2 / Guitar Hero)"
+        ],
+        [
+          "With",
+          "Marlena — hang as a couple with Chris and Chey"
         ]
       ],
       "factsReplace": true

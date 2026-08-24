@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-24T16:17:13.728Z",
+  "updated": "2026-08-24T16:17:14.858Z",
   "changes": [
     {
       "at": "2026-08-23T21:48:33.307Z",
@@ -59,6 +59,13 @@
     },
     {
       "at": "2026-08-24T16:17:13.728Z",
+      "kind": "journal",
+      "id": "marijke",
+      "name": "marijke",
+      "text": "I got a decline from Marijke this morning. I texted her about 10 minutes ago to see if she meant to do that or if it was an accident."
+    },
+    {
+      "at": "2026-08-24T16:17:14.858Z",
       "kind": "journal",
       "id": "marijke",
       "name": "marijke",

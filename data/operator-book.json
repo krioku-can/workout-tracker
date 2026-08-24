@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-24T16:24:53.503Z",
+  "updated": "2026-08-24T16:25:03.949Z",
   "changes": [
     {
       "at": "2026-08-23T21:48:33.307Z",
@@ -77,6 +77,13 @@
       "id": "cal-2026-08-24-mt7g5j8i",
       "name": "Test Meeting",
       "text": "2026-08-24"
+    },
+    {
+      "at": "2026-08-24T16:25:03.949Z",
+      "kind": "cal-edit",
+      "id": "cal-2026-08-24-mt7g5j8i",
+      "name": "Test Meeting Updated",
+      "text": "Updated from Made by Lumi calendar."
     }
   ],
   "records": {

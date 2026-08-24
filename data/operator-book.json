@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-24T16:17:14.858Z",
+  "updated": "2026-08-24T16:24:53.503Z",
   "changes": [
     {
       "at": "2026-08-23T21:48:33.307Z",
@@ -70,6 +70,13 @@
       "id": "marijke",
       "name": "marijke",
       "text": "I got a decline from Marijke this morning. I texted her about 10 minutes ago to see if she meant to do that or if it was an accident."
+    },
+    {
+      "at": "2026-08-24T16:24:53.503Z",
+      "kind": "cal-add",
+      "id": "cal-2026-08-24-mt7g5j8i",
+      "name": "Test Meeting",
+      "text": "2026-08-24"
     }
   ],
   "records": {

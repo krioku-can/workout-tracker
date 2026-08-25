@@ -274,6 +274,15 @@
       <button class="btn-complete ready" id="completeBtn" onclick="toggleToday()">✅ Mark Complete</button>
     </div>
 
+    <div class="backfill-section" style="margin-top:16px">
+      <div class="week-title">Backfill a past day</div>
+      <div id="backfillStatus" style="font-size:13px;color:var(--text-dim);margin-bottom:8px"></div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <input id="backfillCount" type="number" min="1" max="300" inputmode="numeric" placeholder="How many did you do?" style="flex:1;min-width:0;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);font-size:18px;font-weight:700;text-align:center">
+        <button class="btn-complete ready" id="backfillBtn" onclick="backfillYesterday()">Add to yesterday</button>
+      </div>
+    </div>
+
     <div class="week-section">
       <div class="week-title">This Week</div>
       <div id="weekList"></div>
@@ -482,6 +491,31 @@ async function toggleDate(dateStr) {
   if (btn && !wasBusy) { btn.disabled = false; }
 }
 
+// Backfill: add pushup reps to yesterday's count for the current user.
+function offsetStr(n) {
+  const d = new Date(); d.setDate(d.getDate() + n);
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function offsetLabel(n) {
+  const d = new Date(); d.setDate(d.getDate() + n);
+  return formatShort(d) + ' · ' + DAYS[d.getDay()];
+}
+async function backfillYesterday() {
+  if (!currentUser) { alert('Tap your name first!'); return; }
+  const inp = document.getElementById('backfillCount');
+  const n = inp ? parseInt(inp.value, 10) : null;
+  if (!n || n <= 0) { if (inp) inp.focus(); return; }
+  const btn = document.getElementById('backfillBtn');
+  const ydate = offsetStr(-1);
+  const prev = data?.workouts?.[currentUser]?.[ydate];
+  const base = typeof prev === 'number' ? prev : 0;
+  if (btn) { btn.textContent = 'Saving...'; btn.disabled = true; }
+  await markDone(currentUser, ydate, base + n);
+  await fetchData();
+  render();
+  if (btn) { btn.textContent = 'Add to yesterday'; btn.disabled = false; }
+}
+
 function getWeekDates() {
   const today = new Date(); const day = today.getDay();
   const monday = new Date(today); monday.setDate(today.getDate() - ((day + 6) % 7));
@@ -667,6 +701,18 @@ function render() {
   const storedCount = currentUser && data.workouts?.[currentUser]?.[todayStr()];
   if (countInput && typeof storedCount === 'number') {
     countInput.value = storedCount;
+  }
+
+  // Backfill status: show yesterday's current state for the selected user.
+  const backfillStatus = document.getElementById('backfillStatus');
+  if (backfillStatus) {
+    if (!currentUser) {
+      backfillStatus.textContent = 'Tap your name first to backfill yesterday.';
+    } else {
+      const yv = data.workouts?.[currentUser]?.[offsetStr(-1)];
+      const yDone = yv === true || (typeof yv === 'number' && yv > 0);
+      backfillStatus.textContent = 'Yesterday · ' + offsetLabel(-1) + ' — ' + (yDone ? (typeof yv === 'number' ? yv + ' reps logged' : 'done logged') : 'nothing logged yet');
+    }
   }
 
   const btn = document.getElementById('completeBtn');

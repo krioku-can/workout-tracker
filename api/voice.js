@@ -71,7 +71,35 @@ module.exports = async (req, res) => {
   }
 
   if (req.method === "POST") {
-    // Upload a voice memo: { audio: <base64>, ts: <timestamp> }
+    // Two modes:
+    // 1) Upload a voice memo: { audio: <base64>, ts: <timestamp> }
+    // 2) Write a review: { kind: "review", name: <stem>, review: <markdown>, transcript: <text> }
+    const kind = req.body && req.body.kind;
+    if (kind === "review") {
+      const name = req.body.name;
+      const review = req.body.review;
+      const transcript = req.body.transcript || "";
+      if (!name || !review) {
+        res.status(400).json({ error: "Missing name or review" });
+        return;
+      }
+      const path = "/contents/reviews/" + name + ".md";
+      const content = Buffer.from(review).toString("base64");
+      const body = { message: "review " + name, content: content, branch: BRANCH };
+      const r = await githubRequest("PUT", path, body);
+      if (r.status !== 200 && r.status !== 201) {
+        res.status(500).json({ error: "Review write failed" });
+        return;
+      }
+      // Also stash the transcript alongside
+      if (transcript) {
+        const tpath = "/contents/transcripts/" + name + ".txt";
+        const tbody = { message: "transcript " + name, content: Buffer.from(transcript).toString("base64"), branch: BRANCH };
+        await githubRequest("PUT", tpath, tbody);
+      }
+      res.status(200).json({ ok: true, name: name + ".md" });
+      return;
+    }
     const audio = req.body && req.body.audio;
     const ts = req.body && req.body.ts;
     if (!audio || !ts) {
@@ -88,8 +116,18 @@ module.exports = async (req, res) => {
   }
 
   if (req.method === "GET") {
-    // ?folder=inbox|reviews  → list files
-    const folder = req.query.folder === "reviews" ? "reviews" : "inbox";
+    // ?folder=inbox|reviews|transcripts  → list files
+    // ?file=<path>  → read file content (base64)
+    if (req.query.file) {
+      const content = await readFile(req.query.file);
+      if (content === null) {
+        res.status(404).json({ error: "File not found" });
+        return;
+      }
+      res.status(200).json({ content: content });
+      return;
+    }
+    const folder = req.query.folder === "reviews" ? "reviews" : (req.query.folder === "transcripts" ? "transcripts" : "inbox");
     const files = await listFolder(folder);
     res.status(200).json({ files: files });
     return;

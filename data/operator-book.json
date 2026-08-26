@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-26T17:09:45.455Z",
+  "updated": "2026-08-26T17:10:33.844Z",
   "changes": [
     {
       "at": "2026-08-23T21:48:33.307Z",
@@ -112,6 +112,13 @@
       "id": "marijke",
       "name": "marijke",
       "text": "Prepped for m."
+    },
+    {
+      "at": "2026-08-26T17:10:33.844Z",
+      "kind": "journal",
+      "id": "marijke",
+      "name": "marijke",
+      "text": "We had to purchase her domain and a Google workspace account. We weren’t able to link everything up though. It said it could take up to 48 hours. We are going to try again on Monday."
     }
   ],
   "records": {

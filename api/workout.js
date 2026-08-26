@@ -131,56 +131,70 @@ function recalcStreaks(data) {
   return data;
 }
 
-module.exports = async (req, res) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
-  if (req.method === 'OPTIONS') {
-    res.status(200).end();
-    return;
+// Shared core: read state, mutate via the canonical contract, write, return.
+// Used by both the REST API (api/workout.js) and the MCP server (api/workout-mcp.js).
+// Contract: POST-style mutations go through `applySet(data, {user, date, count})`.
+//   - count > 0   → workouts[user][date] = count
+//   - count === 0 → delete workouts[user][date]
+//   - count null/undefined → delete workouts[user][date]  (backward compat)
+function applySet(data, { user, date, count }) {
+  if (!user || !date) throw new Error('Missing user or date');
+  if (!['chris', 'chey'].includes(user)) throw new Error('Invalid user');
+  if (!data.workouts[user]) data.workouts[user] = {};
+  if (typeof count === 'number') {
+    if (count > 0) data.workouts[user][date] = count;
+    else delete data.workouts[user][date];
+  } else {
+    delete data.workouts[user][date];
   }
+  return recalcStreaks(data);
+}
 
-  if (req.method === 'GET') {
-    const data = await loadData();
-    res.setHeader('Content-Type', 'application/json');
-    res.status(200).json(data);
-    return;
-  }
+// Today as YYYY-MM-DD in the server's local timezone (matches recalcStreaks).
+function todayLocal() {
+  const today = new Date();
+  return today.getFullYear() + '-' +
+    String(today.getMonth() + 1).padStart(2, '0') + '-' +
+    String(today.getDate()).padStart(2, '0');
+}
 
-  if (req.method === 'POST') {
-    const { user, date, count } = req.body;
-    if (!user || !date) {
-      res.status(400).json({ error: 'Missing user or date' });
+module.exports = {
+  loadData,
+  saveData,
+  recalcStreaks,
+  applySet,
+  todayLocal,
+  // The default export remains the Vercel handler so the existing /api/workout
+  // route keeps working unchanged.
+  default: async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    if (req.method === 'OPTIONS') { res.status(200).end(); return; }
+
+    if (req.method === 'GET') {
+      const data = await loadData();
+      res.setHeader('Content-Type', 'application/json');
+      res.status(200).json(data);
       return;
     }
-    if (!['chris', 'chey'].includes(user)) {
-      res.status(400).json({ error: 'Invalid user' });
+
+    if (req.method === 'POST') {
+      const { user, date, count } = req.body;
+      try {
+        const data = await loadData();
+        applySet(data, { user, date, count });
+        const saved = await saveData(data);
+        if (!saved) { res.status(500).json({ error: 'Failed to save data' }); return; }
+        res.setHeader('Content-Type', 'application/json');
+        res.status(200).json(data);
+      } catch (e) {
+        res.status(400).json({ error: e.message });
+      }
       return;
     }
 
-    const data = await loadData();
-    if (!data.workouts[user]) data.workouts[user] = {};
-
-    if (data.workouts[user][date] === true || data.workouts[user][date] != null) {
-      delete data.workouts[user][date];
-    } else {
-      // Store the rep count if provided, else true (backward compat)
-      data.workouts[user][date] = (typeof count === 'number' && count > 0) ? count : true;
-    }
-
-    recalcStreaks(data);
-    const saved = await saveData(data);
-
-    if (!saved) {
-      res.status(500).json({ error: 'Failed to save data' });
-      return;
-    }
-
-    res.setHeader('Content-Type', 'application/json');
-    res.status(200).json(data);
-    return;
+    res.status(405).json({ error: 'Method not allowed' });
   }
-
-  res.status(405).json({ error: 'Method not allowed' });
 };
+

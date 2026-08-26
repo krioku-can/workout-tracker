@@ -1,12 +1,15 @@
 {
   "functions": {
     "api/workout.js": { "memory": 256, "maxDuration": 10 },
+    "api/workout-mcp.js": { "memory": 256, "maxDuration": 10 },
     "api/operator.js": { "memory": 256, "maxDuration": 10 },
     "api/voice.js": { "memory": 256, "maxDuration": 30 }
   },
   "rewrites": [
     { "source": "/api/operator", "destination": "/api/operator" },
     { "source": "/api/voice", "destination": "/api/voice" },
+    { "source": "/api/workout-mcp", "destination": "/api/workout-mcp" },
+    { "source": "/api/workout-mcp/sse", "destination": "/api/workout-mcp" },
     { "source": "/api/(.*)", "destination": "/api/workout" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]

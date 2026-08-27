@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-27T01:37:16.915Z",
+  "updated": "2026-08-27T02:01:26.455Z",
   "changes": [
     {
       "at": "2026-08-23T21:48:33.307Z",
@@ -168,6 +168,13 @@
       "id": "cherry",
       "name": "cherry",
       "text": "Get on the floor and play."
+    },
+    {
+      "at": "2026-08-27T02:01:26.455Z",
+      "kind": "edit",
+      "id": "couples-hang",
+      "name": "Hang with Anthony and Marlena",
+      "text": "next Hang with Anthony and Marlena"
     }
   ],
   "records": {
@@ -221,6 +228,11 @@
         ]
       ],
       "factsReplace": true
+    },
+    "couples-hang": {
+      "nextWhat": "Hang with Anthony and Marlena",
+      "nextWhen": "2026-08-29",
+      "at": "2026-08-27T02:01:26.455Z"
     }
   },
   "rels": []

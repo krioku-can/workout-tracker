@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-26T17:17:29.552Z",
+  "updated": "2026-08-27T00:35:02.755Z",
   "changes": [
     {
       "at": "2026-08-23T21:48:33.307Z",
@@ -147,6 +147,13 @@
       "id": "marijke",
       "name": "marijke",
       "text": "Confirmed GoDaddy owns m.consulting.com. Workspace needs to be created."
+    },
+    {
+      "at": "2026-08-27T00:35:02.755Z",
+      "kind": "journal",
+      "id": "book",
+      "name": "Operator book",
+      "text": "shipped operator gate and in-app talk"
     }
   ],
   "records": {

@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-27T00:35:02.755Z",
+  "updated": "2026-08-27T01:37:08.211Z",
   "changes": [
     {
       "at": "2026-08-23T21:48:33.307Z",
@@ -154,6 +154,13 @@
       "id": "book",
       "name": "Operator book",
       "text": "shipped operator gate and in-app talk"
+    },
+    {
+      "at": "2026-08-27T01:37:08.211Z",
+      "kind": "journal",
+      "id": "leora",
+      "name": "leora",
+      "text": "Leora picked up from school."
     }
   ],
   "records": {
